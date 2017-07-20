@@ -2,6 +2,10 @@
 #include <QSqlTableModel>
 #include "ui_mainwindow.h"
 #include <QDebug>
+#include <QByteArray>
+#include <QPixmap>
+#include <QFile>
+#include <QIODevice>
 #include <QMessageBox>
 #include <QSqlError>
 MainWindow::MainWindow(QWidget *parent) :
@@ -19,7 +23,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->linePrice->setPlaceholderText("Price");
     id =_sqlTut->get_last_id_record();
     mode = new QSqlTableModel(this);
-    mode->setTable("yen");
+    mode->setTable("imageData");
     mode->setEditStrategy(QSqlTableModel::OnManualSubmit);
     mode->select();
 
@@ -48,13 +52,24 @@ void MainWindow::on_pushButton_2_clicked()
 //    QString id = ui->lineId->text();
     QString nameProduct = ui->lineName->text();
     QString price = ui->linePrice->text();
+    //load image -> QImage->QbyteArray->save to db
+    QFile file("/home/actiso/Desktop/r3.jpg");
+    if(file.open(QIODevice::ReadOnly)){
+        qDebug()<<"Read success";
+    }else{
+        qDebug()<<"Read failed";
+        return;
+    }
+    QByteArray inByteArray = file.readAll();
+
     int priceInt = price.toInt();
-    addFeature.prepare("INSERT INTO yen (id, nameProduct, price) VALUES \
-                       (:id, :namePro, :price);");
+    addFeature.prepare("INSERT INTO imageData (id, nameProduct, price, imageName) VALUES \
+                       (:id, :namePro, :price,:imagedata);");
 
     addFeature.bindValue(":id",id);
     addFeature.bindValue(":namePro",nameProduct);// must has ":" , if not have error : NO query
     addFeature.bindValue(":price",priceInt);
+    addFeature.bindValue(":imagedata",inByteArray);
 //    addFeature.addBindValue(nameProduct);
 //    addFeature.addBindValue(priceInt);
 //    addFeature.addBindValue(true);
@@ -73,16 +88,20 @@ void MainWindow::on_pushButton_2_clicked()
 void MainWindow::on_pushButton_4_clicked()
 {
     QSqlQuery printQuery;
-    printQuery.prepare("SELECT * FROM yen");
+    printQuery.prepare("SELECT imageName FROM imageData");
     printQuery.exec();
 //    int id_id= printQuery.record().indexOf("id");
-//    int id_pro = printQuery.record().indexOf("nameProduct");
+    int idImage = printQuery.record().indexOf("imageName");
 //    int id_price = printQuery.record().indexOf("price");
-//    while(printQuery.next()){
-//        QString namePro = printQuery.value(id_pro).toString();
+    while(printQuery.next()){
+        QByteArray imageArray = printQuery.value(idImage).toByteArray();
 //        int price = printQuery.value(id_price).toInt();
 //        qDebug() <<namePro <<":"<<price;
-//    }
+        QPixmap pixmap = QPixmap();
+        pixmap.loadFromData(imageArray);
+        ui->labelImage->setPixmap(pixmap);
+        ui->labelImage->show();
+    }
     printQuery.finish();
     mode->database().transaction();//connect db
     if(mode->submitAll()){
@@ -92,6 +111,7 @@ void MainWindow::on_pushButton_4_clicked()
         qDebug() <<"roolback";
         mode->database().rollback();
     }
+
 }
 
 void MainWindow::on_pushButton_3_clicked()

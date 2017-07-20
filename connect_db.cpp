@@ -19,9 +19,10 @@ bool connect_db::createTable(){
     bool success = false;
 
     QSqlQuery tableQuery(m_db);
-    tableQuery.prepare("CREATE TABLE yen (id INTEGER PRIMARY KEY,\
+    tableQuery.prepare("CREATE TABLE imageData (id INTEGER PRIMARY KEY,\
                                                  nameProduct VARCHAR(64),\
-                                                 price INTEGER)");
+                                                 price INTEGER,\
+                                                 imageName BLOB)");
     if(tableQuery.exec()){
         qDebug()<< "Creat table successfully";
         success = true;
@@ -35,7 +36,7 @@ bool connect_db::createTable(){
 }
 int connect_db::get_last_id_record(){
     QSqlQuery lastQuery(m_db);
-    lastQuery.prepare("SELECT * FROM yen ORDER BY 1 DESC LIMIT 1;");
+    lastQuery.prepare("SELECT * FROM imageData ORDER BY 1 DESC LIMIT 1;");
     if(lastQuery.exec()){
         qDebug()<< "find last success";
     }else {
