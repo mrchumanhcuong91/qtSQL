@@ -111,7 +111,7 @@ void MainWindow::on_pushButton_4_clicked()
         qDebug() <<"roolback";
         mode->database().rollback();
     }
-
+//debug
 }
 
 void MainWindow::on_pushButton_3_clicked()
