@@ -29,6 +29,7 @@ private:
     QSqlTableModel* mode;
     Ui::MainWindow *ui;
     QString _nameTable;
+    QString _pathImage;
     connect_db* _sqlTut;
 };
 

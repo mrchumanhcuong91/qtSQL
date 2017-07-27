@@ -8,6 +8,7 @@
 #include <QIODevice>
 #include <QMessageBox>
 #include <QSqlError>
+#include <QFileDialog>
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -21,6 +22,7 @@ MainWindow::MainWindow(QWidget *parent) :
 //    ui->lineId->setPlaceholderText("id");
     ui->lineName->setPlaceholderText("name of product");
     ui->linePrice->setPlaceholderText("Price");
+    ui->lineNameImage->setPlaceholderText("path to Image");
     id =_sqlTut->get_last_id_record();
     mode = new QSqlTableModel(this);
     mode->setTable("imageData");
@@ -47,13 +49,14 @@ MainWindow::~MainWindow()
 void MainWindow::on_pushButton_2_clicked()
 {
     ++id;
+    QFile file(_pathImage);
     //add new item
     QSqlQuery addFeature;
 //    QString id = ui->lineId->text();
     QString nameProduct = ui->lineName->text();
     QString price = ui->linePrice->text();
     //load image -> QImage->QbyteArray->save to db
-    QFile file("/home/actiso/Desktop/r3.jpg");
+//    if(!_pathImage.isEmpty())
     if(file.open(QIODevice::ReadOnly)){
         qDebug()<<"Read success";
     }else{
@@ -99,8 +102,12 @@ void MainWindow::on_pushButton_4_clicked()
 //        qDebug() <<namePro <<":"<<price;
         QPixmap pixmap = QPixmap();
         pixmap.loadFromData(imageArray);
-        ui->labelImage->setPixmap(pixmap);
+        QPixmap p1(pixmap.scaled(150, 200, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
+
+        ui->labelImage->setPixmap(p1);
         ui->labelImage->show();
+        ui->labelImage->setFixedHeight(p1.height());
+        ui->labelImage->setFixedWidth(p1.width());
     }
     printQuery.finish();
     mode->database().transaction();//connect db
@@ -111,10 +118,18 @@ void MainWindow::on_pushButton_4_clicked()
         qDebug() <<"roolback";
         mode->database().rollback();
     }
+    _pathImage ="";
+    ui->lineNameImage->setPlaceholderText("path to Image");
 //debug
 }
 
 void MainWindow::on_pushButton_3_clicked()
 {
-    //display image
+    QWidget* exam = new QWidget();
+    _pathImage = QFileDialog::getOpenFileName(exam, tr("Open File"),
+                                              "/home", tr("Images (*.jpg *.xpm *.png *.jpeg)"));
+    ui->lineNameImage->setText(_pathImage);
+    exam->hide();
+//    QDialog* log = new QDialog(this);
+//    log->show();
 }

@@ -53,6 +53,13 @@
         <widget class="QLineEdit" name="lineName"/>
        </item>
        <item>
+        <widget class="QLineEdit" name="lineNameImage">
+         <property name="echoMode">
+          <enum>QLineEdit::Normal</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QLineEdit" name="linePrice"/>
        </item>
       </layout>
@@ -82,14 +89,14 @@
        <item>
         <widget class="QPushButton" name="pushButton_3">
          <property name="text">
-          <string>insert</string>
+          <string>brower</string>
          </property>
         </widget>
        </item>
        <item>
         <widget class="QPushButton" name="pushButton">
          <property name="text">
-          <string>deleted</string>
+          <string/>
          </property>
         </widget>
        </item>
